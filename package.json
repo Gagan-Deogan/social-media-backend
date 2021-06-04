@@ -17,10 +17,13 @@
   },
   "homepage": "https://github.com/GagandeepSingh0115/social-media-backend#readme",
   "dependencies": {
+    "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "mongoose": "^5.12.12",
     "node-modules": "^1.0.1",
-    "passport-google-oauth20": "^2.0.0",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0",
     "yenv": "^3.0.0"
   }
 }
