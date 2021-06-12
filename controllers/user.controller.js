@@ -8,23 +8,21 @@ const {
 
 const userLogin = async (req, res) => {
   try {
-    const { email, username, password } = req.body;
-    let user = await User.findOne({ email, username });
+    let { email, password } = req.body;
+    email = email.toLowerCase();
+    let user = await User.findOne({ email });
     if (user) {
       const match = await isValidPassword(password, user.password);
       if (match) {
         const jwt = issueJWT(user._id);
         user = extractProtectedKey(user);
-        res.status(200).json({
+        return res.status(200).json({
           success: true,
-          data: { user, token: jwt.token },
+          data: { currentUser: user, token: jwt.token },
         });
-        res.end();
       }
     }
-    return res
-      .status(422)
-      .json({ success: false, data: "Invalid Username/Password" });
+    res.status(422).json({ success: false, data: "Invalid Username/Password" });
   } catch (err) {
     res.status(500).json({ success: false, error: "something went wrong" });
   }
@@ -34,16 +32,14 @@ const newUser = async (req, res) => {
   try {
     let user = req.body;
     user.email = user.email.toLowerCase();
-    user.username = user.username.toLowercase();
+    user.username = user.username.toLowerCase();
     const isAlreadyExists = await User.findOne({
-      email: user.email,
-      username: user.username,
+      $or: [{ email: user.email }, { username: user.username }],
     });
     if (isAlreadyExists) {
-      if (user[0].email) {
+      if (isAlreadyExists.email === user.email) {
         res.status(422).json({ success: false, data: "Email Already Exists" });
-      }
-      if (user[0].username) {
+      } else {
         res
           .status(422)
           .json({ success: false, data: "Username Already Exists" });
@@ -51,9 +47,11 @@ const newUser = async (req, res) => {
     } else {
       user.password = await generateHash(user.password);
       let NewUser = new User(user);
+      await NewUser.save();
       res.status(201).json({ success: true, data: "Sign up Successfully" });
     }
   } catch (err) {
+    console.log(err.message);
     res.status(500).json({ success: false, error: "something went wrong" });
   }
 };
@@ -62,7 +60,7 @@ const userDetails = (req, res) => {
   try {
     let { user } = req;
     user = extractProtectedKey(user);
-    res.status(200).json({ success: true, data: user });
+    res.status(200).json({ success: true, data: { currentUser: user } });
   } catch (err) {
     res.status(500).json({ success: false, error: "something went wrong" });
   }
@@ -79,6 +77,7 @@ const changeUsername = async (req, res) => {
     res.status(500).json({ success: false, error: "something went wrong" });
   }
 };
+
 const chnagePassword = async (req, res) => {
   try {
     let { user } = req;
