@@ -1,12 +1,21 @@
 const express = require("express");
 const router = express.Router();
+const { getUserDetailsByUsername } = require("../controllers/params");
 const {
-  getProfileByUsername,
+  sendData,
+  ToogleUserFollowTo,
+} = require("../controllers/profile.controller");
+const { authenticate } = require("../config/passport");
+const {
+  getUserToFollow,
   getProfilePosts,
-} = require("../controllers/params");
-const { sendData } = require("../controllers/profile.controller");
-router.param("username", getProfileByUsername);
-router.param("username", getProfilePosts);
-router.get("/:username", sendData);
+  updateProfile,
+} = require("../middleware/profile.middlware");
+
+router.use(authenticate);
+router.param("username", getUserDetailsByUsername);
+router.get("/:username", getProfilePosts, sendData);
+router.put("/follow", getUserToFollow, ToogleUserFollowTo);
+router.put("/edit-profile", updateProfile, getProfilePosts, sendData);
 
 module.exports = router;

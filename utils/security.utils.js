@@ -33,6 +33,7 @@ const issueJWT = (userId) => {
 };
 const extractProtectedKey = (user) => {
   const userExtracted = {
+    _id: user._id,
     name: user.fullname,
     email: user.email,
     username: user.username,

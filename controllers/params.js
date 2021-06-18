@@ -1,9 +1,5 @@
 const { Post } = require("../models/post.model");
 const { User } = require("../models/user.model");
-const userPopulateOptions = {
-  path: "createdBy",
-  select: "username fullname imageURL",
-};
 
 const getPostById = async (req, res, next, id) => {
   try {
@@ -19,13 +15,14 @@ const getPostById = async (req, res, next, id) => {
   }
 };
 
-const getProfileByUsername = async (req, res, next, username) => {
+const getUserDetailsByUsername = async (req, res, next, username) => {
   try {
-    const profile = await User.findOne({ username }, { password: 0, __v: 0 });
-    if (!profile) {
+    const { user } = req;
+    let userDetails = await User.findOne({ username }, { password: 0, __v: 0 });
+    if (!userDetails) {
       res.status(404).json({ success: false, error: "No user Found" });
     } else {
-      req.profile = profile;
+      req.userDetails = userDetails;
       next();
     }
   } catch (err) {
@@ -33,22 +30,25 @@ const getProfileByUsername = async (req, res, next, username) => {
   }
 };
 
-const getProfilePosts = async (req, res, next) => {
+const searchUsersByUsername = async (req, res, next, username) => {
   try {
-    console.log("hi");
-    const { profile } = req;
-    const posts = await Post.find({ createdBy: profile._id })
-      .populate(userPopulateOptions)
-      .limit(5)
-      .sort({ createdAt: "desc" })
-      .lean();
-    console.log({ posts });
-    req.posts = posts;
+    const searchString = new RegExp(username, "ig");
+    const users = await User.aggregate()
+      .project({
+        fullname: 1,
+        username: 1,
+        imageURL: 1,
+      })
+      .match({ username: searchString });
+    req.users = users;
     next();
   } catch (err) {
     console.log(err.message);
     res.status(503).json({ success: false, error: "something went worng" });
   }
 };
-
-module.exports = { getPostById, getProfileByUsername, getProfilePosts };
+module.exports = {
+  getPostById,
+  getUserDetailsByUsername,
+  searchUsersByUsername,
+};

@@ -1,3 +1,5 @@
+const { extend, concat } = require("lodash");
+
 const { User } = require("../models/user.model");
 const {
   issueJWT,
@@ -51,7 +53,6 @@ const newUser = async (req, res) => {
       res.status(201).json({ success: true, data: "Sign up Successfully" });
     }
   } catch (err) {
-    console.log(err.message);
     res.status(500).json({ success: false, error: "something went wrong" });
   }
 };
@@ -61,18 +62,6 @@ const userDetails = (req, res) => {
     let { user } = req;
     user = extractProtectedKey(user);
     res.status(200).json({ success: true, data: { currentUser: user } });
-  } catch (err) {
-    res.status(500).json({ success: false, error: "something went wrong" });
-  }
-};
-
-const changeUsername = async (req, res) => {
-  try {
-    let { user } = req;
-    const { newName } = req.body;
-    user.name = newName;
-    const updatedUser = await user.save();
-    res.status(200).json({ success: true, data: "Successfull Update" });
   } catch (err) {
     res.status(500).json({ success: false, error: "something went wrong" });
   }
@@ -101,6 +90,5 @@ module.exports = {
   userDetails,
   newUser,
   userLogin,
-  changeUsername,
   chnagePassword,
 };

@@ -6,6 +6,8 @@ const { initialize } = require("./config/passport");
 const users = require("./routes/user.router");
 const posts = require("./routes/post.router");
 const profiles = require("./routes/profile.router");
+const search = require("./routes/search.router");
+const notifications = require("./routes/notification.router");
 const app = express();
 
 app.use(bodyParser.json());
@@ -17,6 +19,8 @@ app.use(initialize());
 app.use("/users", users);
 app.use("/posts", posts);
 app.use("/profiles", profiles);
+app.use("/search", search);
+app.use("/notifications", notifications);
 
 app.use((req, res) => {
   res.status(404).json({
@@ -25,7 +29,8 @@ app.use((req, res) => {
   });
 });
 app.use((err, req, res, next) => {
-  res.status(500).json({
+  console.log(err);
+  res.status(503).json({
     success: false,
     error: "Something went wrong",
   });

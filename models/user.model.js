@@ -1,7 +1,13 @@
 const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
-
+const user = new Schema({
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: "User required for like",
+  },
+});
 const UserSchema = Schema({
   fullname: {
     type: String,
@@ -20,9 +26,18 @@ const UserSchema = Schema({
     type: String,
     required: "password required",
   },
-  image: {
+  imageURL: {
     type: String,
   },
+  headerImageURL: {
+    type: String,
+  },
+  bio: {
+    type: String,
+    maxLength: 160,
+  },
+  following: [user],
+  followers: [user],
 });
 
 const User = mongoose.model("User", UserSchema);

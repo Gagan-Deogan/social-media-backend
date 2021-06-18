@@ -1,8 +1,8 @@
 const { Post } = require("../models/post.model");
-const {
-  isUserLikeThePost,
-  getLikedByCurrentUserFlag,
-} = require("../utils/post.utils");
+const { Notification } = require("../models/notification.model");
+const { getLikedByCurrentUserFlag } = require("../utils/profile.utils");
+const { isUserLikeThePost } = require("../utils/post.utils");
+const { saveLikeNotfication } = require("../utils/notification.utils");
 const { concat, extend } = require("lodash");
 const likesByPopulateOptions = {
   path: "createdBy",
@@ -48,18 +48,22 @@ const createPost = async (req, res) => {
 const likePost = async (req, res) => {
   try {
     let { post, user } = req;
+    let message = "";
     if (isUserLikeThePost(post, user)) {
       post.likes--;
       post.likesBy.id(user._id).remove();
+      message = "Post disliked";
     } else {
       post.likes++;
       const updatedLikesBy = concat(post.likesBy, [
         { _id: user._id, user: user._id },
       ]);
       post.likesBy = extend(post.likesBy, updatedLikesBy);
+      message = "Post liked";
+      saveLikeNotfication(user._id, post.createdBy._id, post._id);
     }
     await post.save();
-    res.status(200).json({ success: true, data: "post liked." });
+    res.status(200).json({ success: true, data: message });
   } catch (err) {
     console.log(err);
     res.status(503).json({ success: false, data: "Something went worng" });

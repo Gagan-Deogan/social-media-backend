@@ -1,6 +1,49 @@
-const sendData = (req, res) => {
-  const { profile, posts } = req;
-  res.status(200).json({ data: { profile, posts } });
+const { concat, extend } = require("lodash");
+const { saveFollowNotification } = require("../utils/notification.utils");
+const {
+  getLikedByCurrentUserFlag,
+  getFollowByCurrentUserFlagAndLeanModel,
+} = require("../utils/profile.utils");
+
+const sendData = async (req, res) => {
+  try {
+    let { userDetails, posts, user } = req;
+    userDetails = getFollowByCurrentUserFlagAndLeanModel(userDetails, user);
+    userDetails.followersLength = userDetails.followers.length;
+    userDetails.followingLength = userDetails.following.length;
+    posts = getLikedByCurrentUserFlag(posts, user);
+    res.status(200).json({ success: true, data: { ...userDetails, posts } });
+  } catch (err) {
+    console.log(err);
+    res.status(503).json({ success: false, data: "Something went wrong" });
+  }
 };
 
-module.exports = { sendData };
+const ToogleUserFollowTo = async (req, res) => {
+  try {
+    let { user, followTo } = req;
+    if (user.following.id(followTo._id)) {
+      user.following.id(followTo._id).remove();
+      followTo.followers.id(user._id).remove();
+    } else {
+      const updateUserFollowering = concat(user.following, [
+        { _id: followTo._id, user: followTo._id },
+      ]);
+      const updatedUserToFollower = concat(followTo.followers, [
+        { _id: user._id, user: user._id },
+      ]);
+      user.following = extend(user.following, updateUserFollowering);
+      followTo.follower = extend(followTo.followers, updatedUserToFollower);
+      saveFollowNotification(followTo._id, user._id);
+    }
+    await user.save();
+    await followTo.save();
+    res.status(200).json({ success: true, data: "User follower list updated" });
+  } catch (err) {
+    console.log(err);
+
+    res.status(503).json({ success: true, error: "Something went wrong" });
+  }
+};
+
+module.exports = { sendData, ToogleUserFollowTo };
