@@ -5,7 +5,7 @@ const notificationTemplate = {
   follow: "started Following You.",
 };
 
-const saveLikeNotfication = async (targetUserId, sourceUserId, PostId) => {
+const saveLikeNotfication = async (sourceUserId, targetUserId, PostId) => {
   try {
     if (String(targetUserId) === String(sourceUserId)) {
       return undefined;

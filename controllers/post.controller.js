@@ -4,10 +4,7 @@ const { getLikedByCurrentUserFlag } = require("../utils/profile.utils");
 const { isUserLikeThePost } = require("../utils/post.utils");
 const { saveLikeNotfication } = require("../utils/notification.utils");
 const { concat, extend } = require("lodash");
-const likesByPopulateOptions = {
-  path: "createdBy",
-  select: "username fullname imageURL",
-};
+
 const userPopulateOptions = {
   path: "createdBy",
   select: "username fullname imageURL",
