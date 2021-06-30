@@ -1,6 +1,13 @@
 const { Post } = require("../models/post.model");
 const { User } = require("../models/user.model");
-
+const followingPopulateOptions = {
+  path: "following.user",
+  select: "username fullname imageURL",
+};
+const followersPopulateOptions = {
+  path: "followers.user",
+  select: "username fullname imageURL",
+};
 const getPostById = async (req, res, next, id) => {
   try {
     const post = await Post.findById(id);
@@ -18,7 +25,9 @@ const getPostById = async (req, res, next, id) => {
 const getUserDetailsByUsername = async (req, res, next, username) => {
   try {
     const { user } = req;
-    let userDetails = await User.findOne({ username }, { password: 0, __v: 0 });
+    let userDetails = await User.findOne({ username }, { password: 0, __v: 0 })
+      .populate(followingPopulateOptions)
+      .populate(followersPopulateOptions);
     if (!userDetails) {
       res.status(404).json({ success: false, error: "No user Found" });
     } else {
@@ -43,7 +52,6 @@ const searchUsersByUsername = async (req, res, next, username) => {
     req.users = users;
     next();
   } catch (err) {
-    console.log(err.message);
     res.status(503).json({ success: false, error: "something went worng" });
   }
 };

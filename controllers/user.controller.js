@@ -24,7 +24,9 @@ const userLogin = async (req, res) => {
         });
       }
     }
-    res.status(422).json({ success: false, data: "Invalid Username/Password" });
+    res
+      .status(422)
+      .json({ success: false, error: "Invalid Username/Password" });
   } catch (err) {
     res.status(500).json({ success: false, error: "something went wrong" });
   }
@@ -40,11 +42,11 @@ const newUser = async (req, res) => {
     });
     if (isAlreadyExists) {
       if (isAlreadyExists.email === user.email) {
-        res.status(422).json({ success: false, data: "Email Already Exists" });
+        res.status(422).json({ success: false, error: "Email Already Exists" });
       } else {
         res
           .status(422)
-          .json({ success: false, data: "Username Already Exists" });
+          .json({ success: false, error: "Username Already Exists" });
       }
     } else {
       user.password = await generateHash(user.password);
@@ -79,7 +81,7 @@ const chnagePassword = async (req, res) => {
     } else {
       res
         .status(422)
-        .json({ success: false, data: "Old password isn't valid" });
+        .json({ success: false, error: "Old password isn't valid" });
     }
   } catch (err) {
     res.status(500).json({ success: false, error: "something went wrong" });

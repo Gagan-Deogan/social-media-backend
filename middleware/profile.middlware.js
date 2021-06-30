@@ -51,4 +51,9 @@ const updateProfile = async (req, res, next) => {
     res.status(500).json({ success: false, error: "something went wrong" });
   }
 };
-module.exports = { getUserToFollow, getProfilePosts, updateProfile };
+
+module.exports = {
+  getUserToFollow,
+  getProfilePosts,
+  updateProfile,
+};

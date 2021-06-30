@@ -4,6 +4,8 @@ const { getUserDetailsByUsername } = require("../controllers/params");
 const {
   sendData,
   ToogleUserFollowTo,
+  getUserFollowers,
+  getUserFollowing,
 } = require("../controllers/profile.controller");
 const { authenticate } = require("../config/passport");
 const {

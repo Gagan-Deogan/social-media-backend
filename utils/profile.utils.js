@@ -1,7 +1,17 @@
-const getFollowByCurrentUserFlagAndLeanModel = (userDetails, currentUser) => {
+const getIsFollowFlagAndExtractFollowersAndFollowing = (
+  userDetails,
+  currentUser
+) => {
   const isFollow = !!userDetails.followers.id(currentUser._id);
   const leanObject = userDetails.toObject();
-  return { ...leanObject, isFollow };
+  leanObject.followersLength = leanObject.followers.length;
+  leanObject.followingLength = leanObject.following.length;
+  leanObject.following = leanObject.following.map((follow) => follow.user);
+  leanObject.followers = leanObject.followers.map((follower) => follower.user);
+  return {
+    ...leanObject,
+    isFollow,
+  };
 };
 
 const getLikedByCurrentUserFlag = (posts, currentUser) => {
@@ -19,5 +29,5 @@ const getLikedByCurrentUserFlag = (posts, currentUser) => {
 
 module.exports = {
   getLikedByCurrentUserFlag,
-  getFollowByCurrentUserFlagAndLeanModel,
+  getIsFollowFlagAndExtractFollowersAndFollowing,
 };

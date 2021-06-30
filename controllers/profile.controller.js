@@ -2,15 +2,16 @@ const { concat, extend } = require("lodash");
 const { saveFollowNotification } = require("../utils/notification.utils");
 const {
   getLikedByCurrentUserFlag,
-  getFollowByCurrentUserFlagAndLeanModel,
+  getIsFollowFlagAndExtractFollowersAndFollowing,
 } = require("../utils/profile.utils");
 
 const sendData = async (req, res) => {
   try {
     let { userDetails, posts, user } = req;
-    userDetails = getFollowByCurrentUserFlagAndLeanModel(userDetails, user);
-    userDetails.followersLength = userDetails.followers.length;
-    userDetails.followingLength = userDetails.following.length;
+    userDetails = getIsFollowFlagAndExtractFollowersAndFollowing(
+      userDetails,
+      user
+    );
     posts = getLikedByCurrentUserFlag(posts, user);
     res.status(200).json({ success: true, data: { ...userDetails, posts } });
   } catch (err) {
@@ -41,9 +42,11 @@ const ToogleUserFollowTo = async (req, res) => {
     res.status(200).json({ success: true, data: "User follower list updated" });
   } catch (err) {
     console.log(err);
-
     res.status(503).json({ success: true, error: "Something went wrong" });
   }
 };
 
-module.exports = { sendData, ToogleUserFollowTo };
+module.exports = {
+  sendData,
+  ToogleUserFollowTo,
+};

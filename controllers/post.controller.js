@@ -10,12 +10,15 @@ const userPopulateOptions = {
   select: "username fullname imageURL",
 };
 
-const getPosts = async (req, res) => {
+const getPostsOfFollowings = async (req, res) => {
   try {
     const { user } = req;
-    let posts = await Post.find()
+    const following = user.following.map((user) => user._id);
+    let posts = await Post.find({
+      $or: [{ createdBy: user._id }, { createdBy: { $in: following } }],
+    })
       .populate(userPopulateOptions)
-      .limit(5)
+      .limit(20)
       .sort({ createdAt: "desc" })
       .lean();
     if (!posts) {
@@ -24,7 +27,6 @@ const getPosts = async (req, res) => {
     posts = getLikedByCurrentUserFlag(posts, user);
     res.status(200).json({ success: true, data: posts });
   } catch (err) {
-    console.log(err.message);
     res.status(503).json({ success: false, data: "Something went worng" });
   }
 };
@@ -32,7 +34,7 @@ const getPosts = async (req, res) => {
 const createPost = async (req, res) => {
   try {
     const { user } = req;
-    const { title, imageURL } = req.body;
+    let { title, imageURL } = req.body;
     let NewPost = new Post({ title, imageURL, createdBy: user._id, likes: 0 });
     NewPost = await NewPost.save();
     NewPost = await NewPost.populate(userPopulateOptions).execPopulate();
@@ -62,9 +64,8 @@ const likePost = async (req, res) => {
     await post.save();
     res.status(200).json({ success: true, data: message });
   } catch (err) {
-    console.log(err);
     res.status(503).json({ success: false, data: "Something went worng" });
   }
 };
 
-module.exports = { createPost, getPosts, likePost };
+module.exports = { createPost, getPostsOfFollowings, likePost };

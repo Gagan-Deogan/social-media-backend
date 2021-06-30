@@ -22,6 +22,12 @@ app.use("/profiles", profiles);
 app.use("/search", search);
 app.use("/notifications", notifications);
 
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    data: "Working ryt",
+  });
+});
 app.use((req, res) => {
   res.status(404).json({
     success: false,
