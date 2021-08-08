@@ -34,7 +34,7 @@ const UserSchema = Schema({
   headerImageURL: {
     type: String,
     default:
-      "https://firebasestorage.googleapis.com/v0/b/soical-media-5efd9.appspot.com/o/Rectangle%2023.png?alt=media&token=5f4020e9-0e95-4a68-baf9-ad08cb47f9fc",
+      "https://firebasestorage.googleapis.com/v0/b/soical-media-5efd9.appspot.com/o/Rectangle%201.png?alt=media&token=bf49faea-cd29-4884-8a30-a4b83aceb856",
   },
   bio: {
     type: String,
