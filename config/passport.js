@@ -3,7 +3,6 @@ const path = require("path");
 const passport = require("passport");
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
-const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const { User } = require("../models/user.model");
 const pathToKey = path.join(__dirname, "..", "id_rsa_pub.pem");
 const PUB_KEY = fs.readFileSync(pathToKey, "utf8");
@@ -27,7 +26,7 @@ const strategy = new JwtStrategy(options, async (payload, done) => {
   }
 });
 
-// passport.use(strategy);
+passport.use(strategy);
 
 const initialize = () => {
   return passport.initialize();
